@@ -15,7 +15,7 @@ import scala.compiletime.ops.double
 object WebCrawler {
   val found = mutable.Set[String]()
   val successfulExplored = mutable.Set[String]()
-  
+
   // Only for analysis
   var charsDownloaded = 0
 
@@ -23,7 +23,7 @@ object WebCrawler {
       seen: Set[String],
       layer: Set[String],
       maxConnections: Int
-  )(using Async.Spawn): Set[String] = {
+  )(using Async): Set[String] = Async.group {
     val nextLayer: mutable.Set[String] = mutable.Set()
     val layerIt = layer.toIterator
     var currentConnections = 0
@@ -55,7 +55,7 @@ object WebCrawler {
               res match
                 case Success(Some(content)) =>
                   successfulExplored.add(url)
-                  charsDownloaded += content.length  
+                  charsDownloaded += content.length
 
                   val links = UrlUtils.extractLinks(url, content)
                   found ++= links
@@ -63,7 +63,7 @@ object WebCrawler {
                   resultFutures.remove(resultFutures.map(_._2).indexOf(url))
                   goNext()
                 case Success(None) => ()
-                case Failure(e)    => 
+                case Failure(e) =>
                   println(e)
                   e.printStackTrace()
             )
@@ -75,16 +75,16 @@ object WebCrawler {
     nextLayer.filter(url => !seen.contains(url) && !layer.contains(url)).toSet
   }
 
-  def crawl(url: String, maxConnections: Int)(using Async.Spawn): Unit = {
+  def crawl(url: String, maxConnections: Int)(using Async): Unit = {
     found += url
     val seen = mutable.Set[String]()
     var layer = Set[String](url)
 
-    /* 
+    /*
       TODO Make the function return a lazy list
       which returns found links one by one,
       then the maxDepth can be removed.
-    */
+     */
     val maxDepth = if DEBUG then 2 else 1000
 
     for depth <- 0 until maxDepth do
