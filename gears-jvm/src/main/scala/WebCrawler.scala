@@ -11,11 +11,23 @@ import gears.async.*
 import gears.async.default.given
 import scala.collection.mutable.ListBuffer
 import scala.compiletime.ops.double
+import gears.async.Future.MutableCollector
+
+class CollectorWithSize[T] extends MutableCollector[T]():
+  var size = 0
+  inline def addOne(future: Future[T]): Unit =
+    addFuture(future)
+    size += 1
+
+  def next()(using Async) =
+    assert(size > 0)
+    size -= 1
+    results.read().right.get
 
 object WebCrawler {
   val found = mutable.Set[String]()
   val successfulExplored = mutable.Set[String]()
-  
+
   // Only for analysis
   var charsDownloaded = 0
 
@@ -23,68 +35,55 @@ object WebCrawler {
       seen: Set[String],
       layer: Set[String],
       maxConnections: Int
-  )(using Async.Spawn): Set[String] = {
+  )(using Async): Set[String] = Async.group {
     val nextLayer: mutable.Set[String] = mutable.Set()
     val layerIt = layer.toIterator
     var currentConnections = 0
-    val resultFutures: ListBuffer[(Future[Option[String]], String)] =
-      ListBuffer()
+    val resultFutures = CollectorWithSize[(Option[String], String)]()
 
     def goNext(): Unit =
       if !layerIt.hasNext then return
       val url = layerIt.next()
       resultFutures.addOne(
-        (
-          Future:
-            println("getting url: " + url)
-            val ret = jvmInterruptible(getWebContent(url))
-            println("done!")
-            ret
-          ,
-          url
-        )
+        Future:
+          println("getting url: " + url)
+          val ret = jvmInterruptible(getWebContent(url))
+          println("done!")
+          (ret, url)
       )
 
     for _ <- 0 until min(maxConnections, layer.size) do goNext()
 
-    while !resultFutures.isEmpty do
-      Async.select(
-        resultFutures
-          .map((f, url) =>
-            f.handle(res =>
-              res match
-                case Success(Some(content)) =>
-                  successfulExplored.add(url)
-                  charsDownloaded += content.length  
+    while resultFutures.size > 0 do
+      val res = resultFutures.next().awaitResult
+      res match
+        case Success(Some(content), url) =>
+          successfulExplored.add(url)
+          charsDownloaded += content.length
 
-                  val links = UrlUtils.extractLinks(url, content)
-                  found ++= links
-                  nextLayer ++= links
-                  resultFutures.remove(resultFutures.map(_._2).indexOf(url))
-                  goNext()
-                case Success(None) => ()
-                case Failure(e)    => 
-                  println(e)
-                  e.printStackTrace()
-            )
-          )
-          .toSeq*
-      )
+          val links = UrlUtils.extractLinks(url, content)
+          found ++= links
+          nextLayer ++= links
+          goNext()
+        case Success(None, _) => ()
+        case Failure(e) =>
+          println(e)
+          e.printStackTrace()
     end while
 
     nextLayer.filter(url => !seen.contains(url) && !layer.contains(url)).toSet
   }
 
-  def crawl(url: String, maxConnections: Int)(using Async.Spawn): Unit = {
+  def crawl(url: String, maxConnections: Int)(using Async): Unit = {
     found += url
     val seen = mutable.Set[String]()
     var layer = Set[String](url)
 
-    /* 
+    /*
       TODO Make the function return a lazy list
       which returns found links one by one,
       then the maxDepth can be removed.
-    */
+     */
     val maxDepth = if DEBUG then 2 else 1000
 
     for depth <- 0 until maxDepth do
