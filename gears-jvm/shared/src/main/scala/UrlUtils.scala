@@ -1,4 +1,4 @@
-package crawler
+package shared
 
 object UrlUtils {
   def isValidURL(url: String): Boolean =

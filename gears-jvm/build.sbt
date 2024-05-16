@@ -19,8 +19,19 @@ ThisBuild / nativeConfig ~= { c =>
   else platformOptions
 }
 
+lazy val shared = project
+  .in(file("shared"))
+  .settings(
+    scalaVersion := scala3Version,
+
+    libraryDependencies ++= Seq(
+      "ch.epfl.lamp" %% "gears" % "0.2.0",
+    ),
+  )
+
 lazy val jvm = project
   .in(file("jvm"))
+  .dependsOn(shared)
   .settings(
     name := "web-crawler-gears-jvm",
     version := "0.1.0-SNAPSHOT",
@@ -37,6 +48,7 @@ lazy val jvm = project
 lazy val native = project
   .in(file("native"))
   .enablePlugins(ScalaNativePlugin)
+  .dependsOn(shared)
   .settings(
     name := "web-crawler-gears-native",
     version := "0.1.0-SNAPSHOT",

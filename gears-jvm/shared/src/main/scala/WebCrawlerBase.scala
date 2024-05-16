@@ -1,4 +1,4 @@
-package crawler
+package shared
 
 import scala.concurrent.ExecutionContext
 import scala.collection.mutable
@@ -24,12 +24,14 @@ class CollectorWithSize[T] extends MutableCollector[T]():
     size -= 1
     results.read().right.get
 
-object WebCrawler {
+abstract class WebCrawlerBase {
   val found = mutable.Set[String]()
   val successfulExplored = mutable.Set[String]()
 
   // Only for analysis
   var charsDownloaded = 0
+
+  def getWebContent(url: String)(using Async): Option[String] = ???
 
   def exploreLayer(
       seen: Set[String],
@@ -46,7 +48,7 @@ object WebCrawler {
       val url = layerIt.next()
       resultFutures.addOne(
         Future:
-          val ret = jvmInterruptible(getWebContent(url))
+          val ret = getWebContent(url)
           (ret, url)
       )
 
@@ -91,10 +93,3 @@ object WebCrawler {
   }
 
 }
-
-// To make HTTP requests preemptive
-def jvmInterruptible[T](fn: => T)(using Async): T =
-  val th = Thread.currentThread()
-  cancellationScope(() => th.interrupt()):
-    try fn
-    catch case _: InterruptedException => throw new CancellationException()
