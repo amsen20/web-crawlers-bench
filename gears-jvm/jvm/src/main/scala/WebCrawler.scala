@@ -1,17 +1,6 @@
 package crawler
 
-import scala.concurrent.ExecutionContext
-import scala.collection.mutable
-import scala.io.Source
-import scala.util._
-import scala.math.min
-import scala.concurrent.duration
-
 import gears.async.*
-import gears.async.default.given
-import scala.collection.mutable.ListBuffer
-import scala.compiletime.ops.double
-import gears.async.Future.MutableCollector
 
 import shared.WebCrawlerBase
 
