@@ -46,9 +46,7 @@ object WebCrawler {
       val url = layerIt.next()
       resultFutures.addOne(
         Future:
-          println("getting url: " + url)
           val ret = jvmInterruptible(getWebContent(url))
-          println("done!")
           (ret, url)
       )
 

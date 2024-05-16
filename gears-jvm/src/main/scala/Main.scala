@@ -8,18 +8,23 @@ import gears.async.default.given
 
 given ExecutionContext = ExecutionContext.global
 
-@main def run(): Unit =
-  val timeout = 1 // read it from arguments
-  val maxConnections = 1 // read it from arguments
+@main def run(timeout: Long, maxConnections: Int): Unit =
+  val startTime = System.currentTimeMillis()
+
   Async.blocking:
-    withTimeout(duration.FiniteDuration(timeout, duration.MILLISECONDS))(
-      WebCrawler.crawl(START_URL, maxConnections)
-    )
-  
-  println(s"Found ${WebCrawler.found.size} unique links")
-  println(s"Explored ${WebCrawler.successfulExplored.size} unique links successfully")
-  println(s"Chars downloaded: ${WebCrawler.charsDownloaded}")
-  
+    Seq(
+      Future(AsyncOperations.sleep(timeout)),
+      Future(WebCrawler.crawl(START_URL, maxConnections))
+    ).awaitFirstWithCancel
+
+  val endTime = System.currentTimeMillis()
+  val elapsedTime = endTime - startTime
+
+  println(s"explored=${WebCrawler.successfulExplored.size}")
+  println(s"found=${WebCrawler.found.size}")
+  println(s"totalChars=${WebCrawler.charsDownloaded}")
+  println(s"overheadTime=${elapsedTime - timeout}")
+
   if DEBUG then
     println("Explored links:")
     WebCrawler.successfulExplored.foreach(println(_))
