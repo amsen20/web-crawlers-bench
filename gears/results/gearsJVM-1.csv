@@ -1,5 +1,6 @@
 name,threads,found
-gearsJVM,1,23364
-gearsJVM,2,26698
-gearsJVM,4,26885
+gearsJVM,1,45278
+gearsJVM,10,54806
+gearsJVM,100,57046
+gearsJVM,1000,64711
 
