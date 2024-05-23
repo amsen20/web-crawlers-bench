@@ -4,9 +4,9 @@ import scalanative.build._
 ThisBuild / scalaVersion := "3.3.3"
 
 val gearsVersion = "0.2.0"
-val gurlVersion = "0.1-beb506e-SNAPSHOT"
+val gurlVersion = "0.1-beb506e-20240521T161859Z-SNAPSHOT"
 
-val isDebug = false
+val isDebug = true
 
 lazy val root = crossProject(JVMPlatform, NativePlatform)
   .crossType(CrossType.Full)
@@ -31,10 +31,10 @@ ThisBuild / nativeConfig ~= { c =>
   val platformOptions = c
     .withMultithreading(true)
     .withLTO(LTO.none)
-    .withMode(Mode.debug)
     .withGC(GC.immix)
   if (isDebug)
     platformOptions
+      .withMode(Mode.debug)
       .withSourceLevelDebuggingConfig(
         _.enableAll
       ) // enable generation of debug informations
@@ -43,5 +43,9 @@ ThisBuild / nativeConfig ~= { c =>
         scalanative.build.Mode.debug
       ) // compile using LLVM without optimizations
       .withCompileOptions(Seq("-DSCALANATIVE_DELIMCC_DEBUG"))
-  else platformOptions
+  else 
+    platformOptions
+      .withMode(Mode.debug)
+      // .withMode(Mode.releaseFull)
+      // .withOptimize(true)
 }
