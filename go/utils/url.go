@@ -11,7 +11,7 @@ func isValidURL(targetUrl *url.URL) bool {
 	noParams := targetUrl.RawQuery == ""
 	noFragment := targetUrl.Fragment == ""
 	noUser := targetUrl.User == nil
-	noColon := !strings.Contains(targetUrl.Host, ":") || !strings.Contains(targetUrl.Path, ":")
+	noColon := !strings.Contains(targetUrl.Path, ":")
 	onMainDomain := strings.Contains(targetUrl.Host, MAIN_DOMAIN)
 
 	return prefix && noParams && noColon && onMainDomain && noFragment && noUser
