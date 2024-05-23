@@ -4,7 +4,7 @@ object UrlUtils {
   def isValidURL(url: String): Boolean =
     val prefix = url.startsWith("http://") || url.startsWith("https://")
     val noParams = !url.contains("?")
-    val noColon = !url.slice(url.indexOf("://") + 3, url.length).contains(":")
+    val noColon = true // !url.slice(url.indexOf("://") + 3, url.length).contains(":")
     val onMainDomain = url.contains(MAIN_DOMAIN)
     prefix && noParams && noColon && onMainDomain
 
@@ -34,7 +34,7 @@ object UrlUtils {
       .findAllMatchIn(
         content
       )
-      .map(_.group(2))
+      .map(matched => if matched.group(1).nonEmpty then matched.group(1) else matched.group(2))
       .toList
 
     val baseURL = getBaseURL(url)

@@ -28,5 +28,5 @@ object Experiment:
     if DEBUG then
       println("Explored links:")
       crawler.successfulExplored.foreach(println(_))
-      // println("Found links:")
-      // crawler.found.foreach(println(_))
+      println("Found links:")
+      crawler.found.foreach(println(_))

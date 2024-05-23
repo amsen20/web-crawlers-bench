@@ -16,7 +16,7 @@ class WebCrawler(using curlRuntimeContext: CurlRuntimeContext)
         HttpVersion.V1_0,
         HttpMethod.POST,
         List(),
-        "url",
+        url,
         "".getBytes()
       )
     )(using curlRuntimeContext) match
