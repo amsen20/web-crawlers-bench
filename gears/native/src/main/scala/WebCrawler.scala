@@ -14,7 +14,7 @@ class WebCrawler(using curlRuntimeContext: CurlRuntimeContext)
     CurlRequest(
       SimpleRequest(
         HttpVersion.V1_0,
-        HttpMethod.POST,
+        HttpMethod.GET,
         List(),
         url,
         "".getBytes()

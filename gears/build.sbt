@@ -4,9 +4,9 @@ import scalanative.build._
 ThisBuild / scalaVersion := "3.3.3"
 
 val gearsVersion = "0.2.0"
-val gurlVersion = "0.1-beb506e-20240521T161859Z-SNAPSHOT"
+val gurlVersion = "0.1-e975422-20240606T140441Z-SNAPSHOT"
 
-val isDebug = true
+val isDebug = false
 
 lazy val root = crossProject(JVMPlatform, NativePlatform)
   .crossType(CrossType.Full)
@@ -46,6 +46,6 @@ ThisBuild / nativeConfig ~= { c =>
   else 
     platformOptions
       .withMode(Mode.debug)
-      // .withMode(Mode.releaseFull)
-      // .withOptimize(true)
+      .withMode(Mode.releaseFull)
+      .withOptimize(true)
 }
