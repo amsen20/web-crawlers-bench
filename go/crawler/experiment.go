@@ -20,7 +20,7 @@ func RunExperiment(crawler *WebCrawler, timeout time.Duration, maxConnections in
 	fmt.Printf("explored=%d\n", len(crawler.SuccessfulExplored))
 	fmt.Printf("found=%d\n", len(crawler.Found))
 	fmt.Printf("totalChars=%d\n", crawler.CharsDownloaded)
-	fmt.Printf("overheadTime=%s\n", elapsedTime-timeout)
+	fmt.Printf("overheadTime=%d\n", (elapsedTime-timeout).Milliseconds())
 
 	if utils.DEBUG {
 		fmt.Println("Explored links:")
