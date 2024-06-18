@@ -16,9 +16,9 @@ finish () {
 }
 
 # program arguments config:
-TIMEOUT=1000 # ms
+TIMEOUT=10000 # ms
 REPEATE_COUNT=2
-COOL_DOWN_TIME=1 # s
+COOL_DOWN_TIME=2 # s
 
 
 # program execution config:
@@ -64,7 +64,7 @@ prepare_jvm () {
 # NATIVE
 NATIVE_ROOT="../gears/native"
 set_native_vars () {
-  CMD="$NATIVE_ROOT/target/scala-3.3.3/web-crawler-gears $TIMEOUT $2"
+  CMD="$NATIVE_ROOT/target/scala-3.3.3/web-crawler-gears $1 $TIMEOUT $2"
   ROOT="$NATIVE_ROOT"
   TARGET_FILE="$NATIVE_ROOT/results/test-$1-$2-$3.out"
 }

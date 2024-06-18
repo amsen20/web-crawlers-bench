@@ -1,12 +1,12 @@
 package crawler
 
-import gears.async.*
-import ca.uwaterloo.plg.curl.unsafe.CurlRuntimeContext
-import ca.uwaterloo.plg.curl.http.*
-import ca.uwaterloo.plg.curl.http.simple.*
+import gears.async._
+import gurl.unsafe.CurlRuntimeContext
+import gurl.http.simple._
+import gurl.http._
 
 import shared.WebCrawlerBase
-import scala.util.*
+import scala.util._
 
 class WebCrawler(using curlRuntimeContext: CurlRuntimeContext)
     extends WebCrawlerBase:

@@ -1,15 +1,16 @@
 package shared
 
-import scala.concurrent.ExecutionContext
 import scala.concurrent.duration
 
 import gears.async.*
-import gears.async.default.given
+// import gears.async.default.given
 
 object Experiment:
-  given ExecutionContext = ExecutionContext.global
-
-  def run(crawler: WebCrawlerBase, timeout: Long, maxConnections: Int): Unit =
+  def run(crawler: WebCrawlerBase, timeout: Long, maxConnections: Int)(using
+      support: AsyncSupport,
+      scheduler: support.Scheduler,
+      ops: AsyncOperations
+  ): Unit =
     val startTime = System.currentTimeMillis()
     Async.blocking:
       Seq(
