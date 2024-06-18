@@ -4,7 +4,7 @@ import scalanative.build._
 ThisBuild / scalaVersion := "3.3.3"
 
 val gearsVersion = "0.2.0"
-val gurlVersion = "0.1-e975422-20240606T140441Z-SNAPSHOT"
+val gurlVersion = "0.1-25e65bc-20240617T145217Z-SNAPSHOT"
 
 val isDebug = false
 
@@ -42,10 +42,12 @@ ThisBuild / nativeConfig ~= { c =>
       .withMode(
         scalanative.build.Mode.debug
       ) // compile using LLVM without optimizations
-      .withCompileOptions(Seq("-DSCALANATIVE_DELIMCC_DEBUG"))
-  else 
+    // .withCompileOptions(Seq("-DSCALANATIVE_DELIMCC_DEBUG"))
+  else
     platformOptions
-      .withMode(Mode.debug)
       .withMode(Mode.releaseFull)
       .withOptimize(true)
+      .withSourceLevelDebuggingConfig(
+        _.enableAll
+      ) // enable generation of debug informations
 }
