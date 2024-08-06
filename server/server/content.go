@@ -2,7 +2,7 @@ package server
 
 import "fmt"
 
-func generateContent(seed int) string {
+func generateContent(seed int64) string {
 	var content string
 	for i := 0; i < BRANCH_FACTOR; i++ {
 		content += "<p>\n"
@@ -11,7 +11,7 @@ func generateContent(seed int) string {
 		}
 		content += "</p>\n"
 
-		pageId := (seed * BRANCH_FACTOR) + i
+		pageId := (seed * BRANCH_FACTOR) + int64(i)
 
 		content += `<a href="/page/`
 		content += fmt.Sprintf("%d", pageId)

@@ -19,7 +19,7 @@ func StartServer() {
 
 	r.GET("/page/:id", func(c *gin.Context) {
 		idStr := c.Param("id")
-		var id int
+		var id int64
 		fmt.Sscanf(idStr, "%d", &id)
 		c.HTML(http.StatusOK, "template.html", gin.H{
 			"content": template.HTML(generateContent(id)),

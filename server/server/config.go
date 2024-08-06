@@ -1,9 +1,9 @@
 package server
 
 const (
-	PORT           = 8080
-	BRANCH_FACTOR  = 5
-	CHARS_PER_LINK = 1000
+	PORT           int64 = 8080
+	BRANCH_FACTOR        = 5
+	CHARS_PER_LINK       = 1000
 )
 
 const (
