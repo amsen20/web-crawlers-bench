@@ -4,8 +4,10 @@ import scalanative.build._
 ThisBuild / scalaVersion := "3.3.3"
 
 val catsVersion = "3.5.4"
+val http4sVersion = "0.23.27"
+val htt4psCurlVersion = "0.2.0"
 
-val isDebug = false
+val isDebug = true
 
 lazy val root = crossProject(JVMPlatform, NativePlatform)
   .crossType(CrossType.Full)
@@ -18,8 +20,15 @@ lazy val root = crossProject(JVMPlatform, NativePlatform)
     )
   )
   .jvmSettings(
+    fork := true,
+    libraryDependencies ++= Seq(
+      "org.http4s" %%% "http4s-ember-client" % http4sVersion
+    )
   )
   .nativeSettings(
+    libraryDependencies ++= Seq(
+      "org.http4s" %%% "http4s-curl" % htt4psCurlVersion
+    )
   )
 
 ThisBuild / nativeConfig ~= { c =>
