@@ -13,3 +13,8 @@ const (
 const (
 	DEBUG = false
 )
+
+const (
+	MEAN_ADDITIONAL_DELAY     float64 = 10 // ms
+	STANDARD_DERIVATIVE_DELAY float64 = 2  // ms
+)

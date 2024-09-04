@@ -3,10 +3,14 @@ package server
 import (
 	"fmt"
 	"html/template"
+	"io/ioutil"
+	"math/rand"
 	"net/http"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func StartServer() {
@@ -21,9 +25,23 @@ func StartServer() {
 		idStr := c.Param("id")
 		var id int64
 		fmt.Sscanf(idStr, "%d", &id)
+
+		delay := MEAN_ADDITIONAL_DELAY + STANDARD_DERIVATIVE_DELAY*rand.NormFloat64()
+		time.Sleep(time.Duration(delay) * time.Millisecond)
+
 		c.HTML(http.StatusOK, "template.html", gin.H{
 			"content": template.HTML(generateContent(id)),
 		})
+	})
+
+	r.GET("/http", func(c *gin.Context) {
+		randomString := uuid.New().String()
+		c.String(http.StatusOK, randomString)
+	})
+
+	r.POST("/http/echo", func(c *gin.Context) {
+		body, _ := ioutil.ReadAll(c.Request.Body)
+		c.String(http.StatusOK, string(body))
 	})
 
 	r.Run(fmt.Sprintf("0.0.0.0:%d", PORT))
