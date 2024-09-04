@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 USAGE="$0 (target parameter)"
-show_usage () {
+show_usage() {
   echo "Error: $1"
   echo $USAGE
   exit 1
@@ -19,23 +19,30 @@ fi
 TARGET_DIR="./results/$PARAM-$(date +%Y%m%d%H%M%S)"
 mkdir $TARGET_DIR
 
-for name in go jvm native; do
+for name in go gJvm gNative cJvm cNative; do
   case $name in
-    go)
-      RESULTS_DIR="../go/results"
-      ;;
-    jvm)
-      RESULTS_DIR="../gears/jvm/results"
-      ;;
-    native)
-      RESULTS_DIR="../gears/native/results"
-      ;;
-    *)
-      echo "should not reach here"
-      exit 1
-      ;;
+  go)
+    RESULTS_DIR="../go/results"
+    ;;
+  gJvm)
+    RESULTS_DIR="../gears/jvm/results"
+    ;;
+  gNative)
+    RESULTS_DIR="../gears/native/results"
+    ;;
+  cJvm)
+    RESULTS_DIR="../cats/jvm/results"
+    ;;
+  cNative)
+    RESULTS_DIR="../cats/native/results"
+    ;;
+
+  *)
+    echo "should not reach here"
+    exit 1
+    ;;
   esac
-  
+
   if [ ! -d $RESULTS_DIR ]; then
     echo "No results directory for $name"
     continue
@@ -45,13 +52,13 @@ for name in go jvm native; do
     if [ -f "$file" ]; then
       threads=$(echo "$file" | awk -F'-' '{print $2}')
       connections=$(echo "$file" | awk -F'-' '{print $3}')
-      
+
       param_val=$(cat $file | grep "$PARAM=" | cut -d"=" -f2)
-      target_file="$TARGET_DIR/t-$threads-$param.csv"
+      target_file="$TARGET_DIR/t-$threads.csv"
       if [ ! -f $target_file ]; then
-        echo "name,connections,$PARAM" > $target_file
+        echo "name,connections,$PARAM" >$target_file
       fi
-      echo "$name,$connections,$param_val" >> $target_file
+      echo "$name,$connections,$param_val" >>$target_file
     fi
   done
 done
