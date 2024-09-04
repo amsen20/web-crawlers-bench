@@ -2,9 +2,11 @@ import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 import scalanative.build._
 
 ThisBuild / scalaVersion := "3.3.3"
+ThisBuild / scalacOptions += "-deprecation"
 
 val gearsVersion = "0.2.0"
-val gurlVersion = "0.1-25e65bc-20240617T145217Z-SNAPSHOT"
+val purlVersion = "0.2-779c415-20240904T173117Z-SNAPSHOT"
+val gearsPurlVersion = "0.2-779c415-20240904T173117Z-SNAPSHOT"
 
 val isDebug = false
 
@@ -24,7 +26,10 @@ lazy val root = crossProject(JVMPlatform, NativePlatform)
     libraryDependencies += "com.lihaoyi" %% "requests" % "0.8.2"
   )
   .nativeSettings(
-    libraryDependencies += "ca.uwaterloo.plg" %%% "gurl" % gurlVersion
+    libraryDependencies ++= Seq(
+      "ca.uwaterloo.plg" %%% "purl" % purlVersion,
+      "ca.uwaterloo.plg" %%% "gearspurl" % gearsPurlVersion
+    )
   )
 
 ThisBuild / nativeConfig ~= { c =>
@@ -34,7 +39,6 @@ ThisBuild / nativeConfig ~= { c =>
     .withGC(GC.immix)
   if (isDebug)
     platformOptions
-      .withMode(Mode.debug)
       .withSourceLevelDebuggingConfig(
         _.enableAll
       ) // enable generation of debug informations
@@ -42,12 +46,9 @@ ThisBuild / nativeConfig ~= { c =>
       .withMode(
         scalanative.build.Mode.debug
       ) // compile using LLVM without optimizations
-    // .withCompileOptions(Seq("-DSCALANATIVE_DELIMCC_DEBUG"))
+      .withCompileOptions(Seq("-DSCALANATIVE_DELIMCC_DEBUG"))
   else
     platformOptions
       .withMode(Mode.releaseFull)
       .withOptimize(true)
-      .withSourceLevelDebuggingConfig(
-        _.enableAll
-      ) // enable generation of debug informations
 }
