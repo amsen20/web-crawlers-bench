@@ -1,19 +1,20 @@
 package crawler
 
 import gears.async._
-import gurl.unsafe.CurlRuntimeContext
-import gurl.http.simple._
-import gurl.http._
+import purl.unsafe.CurlRuntimeContext
+import pollerBear.runtime.ActivePoller
+import purl.http.simple._
+import purl.http._
 
 import shared.WebCrawlerBase
 import scala.util._
 
-class WebCrawler(using curlRuntimeContext: CurlRuntimeContext)
+class WebCrawler(using curlRuntimeContext: CurlRuntimeContext, p: ActivePoller)
     extends WebCrawlerBase:
   override def getWebContent(url: String)(using Async): Option[String] =
-    CurlRequest(
+    gearsPurl.request(
       SimpleRequest(
-        HttpVersion.V1_0,
+        HttpVersion.V1_1,
         HttpMethod.GET,
         List(),
         url,
