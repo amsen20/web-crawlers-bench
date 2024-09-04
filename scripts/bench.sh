@@ -126,6 +126,26 @@ if [ $# -ne 1 ]; then
   show_usage "Missing program argument"
 fi
 
+# Single threaded
+SINGE_THREADED_ROOT="../single-threaded"
+set_single_threaded_vars() {
+  CMD="$SINGE_THREADED_ROOT/target/scala-3.3.3/crawler $TIMEOUT $2"
+  ROOT="$SINGE_THREADED_ROOT"
+  TARGET_FILE="$SINGE_THREADED_ROOT/results/test-$1-$2-$3.out"
+  export GC_STATS_FILE="$SINGE_THREADED_ROOT/results/gc-stats-$1-$2-$3.csv"
+}
+prepare_single_threaded() {
+  HERE=$(pwd)
+  cd "$SINGE_THREADED_ROOT/.."
+
+  sbt run
+  if [ $? -ne 0 ]; then
+    finish "Failed to build single threaded native program"
+  fi
+
+  cd $HERE
+}
+
 NAME=$1
 case $NAME in
 go)
@@ -167,6 +187,24 @@ cNative)
   prepare() {
     prepare_cats_native
   }
+  ;;
+singleThreaded)
+  set_vars() {
+    set_single_threaded_vars $1 $2 $3
+  }
+  prepare() {
+    prepare_single_threaded
+  }
+  ;;
+all)
+  echo "Running all benchmarks"
+  for name in go gJvm gNative cJvm cNative singleThreaded; do
+    $0 $name
+    if [ $? -ne 0 ]; then
+      finish "failed to run the experiment for $name"
+    fi
+  done
+  exit 0
   ;;
 *)
   show_usage "Invalid program argument"

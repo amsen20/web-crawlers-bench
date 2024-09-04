@@ -1,17 +1,5 @@
 #!/usr/bin/bash
 
-USAGE="$0 (target parameter)"
-show_usage() {
-  echo "Error: $1"
-  echo $USAGE
-  exit 1
-}
-
-if [ $# -ne 1 ]; then
-  show_usage "Missing program argument"
-fi
-PARAM=$1
-
 if [ ! -d "./results" ]; then
   mkdir "./results"
 fi
@@ -51,17 +39,13 @@ for name in go gJvm gNative cJvm cNative; do
     continue
   fi
 
-  for file in $RESULTS_DIR/test-*; do
-    if [ -f "$file" ]; then
-      threads=$(echo "$file" | awk -F'-' '{print $2}')
-      connections=$(echo "$file" | awk -F'-' '{print $3}')
+  CURRENT_TARGET_DIR="$TARGET_DIR/$name"
+  mkdir $CURRENT_TARGET_DIR
 
-      param_val=$(cat $file | grep "$PARAM=" | cut -d"=" -f2)
-      target_file="$TARGET_DIR/t-$threads.csv"
-      if [ ! -f $target_file ]; then
-        echo "name,connections,$PARAM" >$target_file
-      fi
-      echo "$name,$connections,$param_val" >>$target_file
+  for file in $RESULTS_DIR/gc-stats-*; do
+    if [ -f "$file" ]; then
+      echo "copying $file"
+      cp $file $CURRENT_TARGET_DIR
     fi
   done
 done
