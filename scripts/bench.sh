@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-USAGE="$0 (go|gJvm|gNative|cJvm|cNative)"
+USAGE="$0 (go|gJvm|gNative|cJvm|cNative|singleThreaded|all)"
 
 show_usage() {
   echo "Error: $1"
@@ -136,9 +136,10 @@ set_single_threaded_vars() {
 }
 prepare_single_threaded() {
   HERE=$(pwd)
-  cd "$SINGE_THREADED_ROOT/.."
+  cd "$SINGE_THREADED_ROOT"
 
-  sbt run
+  echo $(pwd)
+  sbt nativeLink
   if [ $? -ne 0 ]; then
     finish "Failed to build single threaded native program"
   fi

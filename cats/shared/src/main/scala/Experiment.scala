@@ -4,6 +4,7 @@ import cats.effect._
 import scala.concurrent.duration._
 import java.sql.Time
 import java.util.concurrent.TimeoutException
+import scala.collection.immutable.HashSet
 
 object Experiment {
   def run(
@@ -13,8 +14,8 @@ object Experiment {
   ): IO[Unit] =
     for {
 
-      successfulExploredR <- Ref.of[IO, Set[String]](Set.empty)
-      foundR <- Ref.of[IO, Set[String]](Set.empty)
+      successfulExploredR <- Ref.of[IO, HashSet[String]](HashSet.empty)
+      foundR <- Ref.of[IO, HashSet[String]](HashSet.empty)
       charsDownloadedR <- Ref.of[IO, Int](0)
       _ <- IO(crawler.initRefs(foundR, successfulExploredR, charsDownloadedR))
 

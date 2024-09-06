@@ -15,6 +15,6 @@ const (
 )
 
 const (
-	MEAN_ADDITIONAL_DELAY     float64 = 10 // ms
+	MEAN_ADDITIONAL_DELAY     float64 = 8 // ms
 	STANDARD_DERIVATIVE_DELAY float64 = 2  // ms
 )

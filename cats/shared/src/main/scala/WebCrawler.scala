@@ -12,16 +12,17 @@ import cats.effect.std.Console
 import cats.effect.std.Queue
 import cats.syntax.all._
 import org.http4s.client.Client
+import scala.collection.immutable.HashSet
 
 class WebCrawler(client: Client[IO]) {
   // TODO: change this to be val and passed by the constructor
-  var foundR: Ref[IO, Set[String]] = null
-  var successfulExploredR: Ref[IO, Set[String]] = null
+  var foundR: Ref[IO, HashSet[String]] = null
+  var successfulExploredR: Ref[IO, HashSet[String]] = null
   var charsDownloadedR: Ref[IO, Int] = null
 
   def initRefs(
-      foundR: Ref[IO, Set[String]],
-      successfulExploredR: Ref[IO, Set[String]],
+      foundR: Ref[IO, HashSet[String]],
+      successfulExploredR: Ref[IO, HashSet[String]],
       charsDownloadedR: Ref[IO, Int]
   ) =
     this.foundR = foundR
@@ -37,7 +38,7 @@ class WebCrawler(client: Client[IO]) {
 
   def exploreUrl(
       url: String,
-      nextLayerR: Ref[IO, Set[String]]
+      nextLayerR: Ref[IO, HashSet[String]]
   ): IO[Unit] =
     for {
       content <- getWebContent(url)
@@ -55,12 +56,12 @@ class WebCrawler(client: Client[IO]) {
     } yield ()
 
   def exploreLayer(
-      seen: Set[String],
-      layer: Set[String],
+      seen: HashSet[String],
+      layer: Array[String],
       maxConnections: Int
-  ): IO[Set[String]] =
+  ): IO[Array[String]] =
     for {
-      nextLayerR <- Ref[IO].of(Set[String]())
+      nextLayerR <- Ref[IO].of(HashSet[String]())
       tokenChan <- Queue.unbounded[IO, Unit]
 
       // add tokens
@@ -85,13 +86,12 @@ class WebCrawler(client: Client[IO]) {
       // get tokens meaning the process is finished
       _ <- List.range(0, maxConnections).map(_ => tokenChan.take).sequence_
       nextLayer <- nextLayerR.get
-    } yield nextLayer
-      .filter(url => !seen.contains(url) && !layer.contains(url))
-      .toSet
+    } yield (nextLayer -- seen)
+      .toArray
 
   def crawlRecursive(
-      seen: Set[String],
-      layer: Set[String],
+      seen: HashSet[String],
+      layer: Array[String],
       maxConnections: Int,
       depth: Int
   ): IO[Unit] =
@@ -116,8 +116,8 @@ class WebCrawler(client: Client[IO]) {
     val maxDepth = if DEBUG then 2 else 1000
 
     for {
-      _ <- foundR.set(Set[String](url))
-      _ <- crawlRecursive(Set.empty, Set(url), maxConnections, maxDepth)
+      _ <- foundR.set(HashSet[String](url))
+      _ <- crawlRecursive(HashSet.empty, Array(url), maxConnections, maxDepth)
     } yield ()
   }
 }

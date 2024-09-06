@@ -7,7 +7,7 @@ val catsVersion = "3.5.4"
 val http4sVersion = "0.23.27"
 val htt4psCurlVersion = "0.2.0"
 
-val isDebug = true
+val isDebug = false
 
 lazy val root = crossProject(JVMPlatform, NativePlatform)
   .crossType(CrossType.Full)
