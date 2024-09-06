@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-USAGE="$0 (target parameter)"
+USAGE="$0 (target parameter/all)"
 show_usage() {
   echo "Error: $1"
   echo $USAGE
@@ -12,6 +12,14 @@ if [ $# -ne 1 ]; then
 fi
 PARAM=$1
 
+if [ "$PARAM" == "all" ]; then
+  for param in found overallOverheadTime memoryUsage; do
+    $0 $param
+  done
+
+  exit 0
+fi
+
 if [ ! -d "./results" ]; then
   mkdir "./results"
 fi
@@ -19,7 +27,7 @@ fi
 TARGET_DIR="./results/$PARAM-$(date +%Y%m%d%H%M%S)"
 mkdir $TARGET_DIR
 
-for name in go gJvm gNative cJvm cNative; do
+for name in go gJvm gNative cJvm cNative singleThreaded; do
   case $name in
   go)
     RESULTS_DIR="../go/results"
@@ -53,14 +61,18 @@ for name in go gJvm gNative cJvm cNative; do
 
   for file in $RESULTS_DIR/test-*; do
     if [ -f "$file" ]; then
-      threads=$(echo "$file" | awk -F'-' '{print $2}')
-      connections=$(echo "$file" | awk -F'-' '{print $3}')
+      echo "processing $file"
+      file_name=$(basename "$file")
+      threads=$(echo "$file_name" | awk -F'-' '{print $2}')
+      connections=$(echo "$file_name" | awk -F'-' '{print $3}')
+      echo "threads=$threads, connections=$connections"
 
       param_val=$(cat $file | grep "$PARAM=" | cut -d"=" -f2)
       target_file="$TARGET_DIR/t-$threads.csv"
       if [ ! -f $target_file ]; then
         echo "name,connections,$PARAM" >$target_file
       fi
+      echo "$name,$connections,$param_val"
       echo "$name,$connections,$param_val" >>$target_file
     fi
   done
