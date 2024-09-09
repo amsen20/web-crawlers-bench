@@ -25,8 +25,6 @@ class CollectorWithSize[T] extends MutableCollector[T]():
     size -= 1
     results.read().right.get
 
-@volatile var counter = 0
-
 abstract class WebCrawlerBase {
   val found = mutable.HashSet[String]()
   val successfulExplored = mutable.HashSet[String]()
