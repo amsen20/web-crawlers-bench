@@ -1,21 +1,20 @@
 package shared
 
-import scala.collection.immutable.HashSet
-
 object UrlUtils {
-  def isValidURL(url: String, baseURL: String): Boolean =
+  def isValidURL(url: String): Boolean =
     val prefix = url.startsWith("http://") || url.startsWith("https://")
     val noParams = !url.contains("?")
-    val noColon = true // !url.slice(url.indexOf("://") + 3, url.length).contains(":")
-    val onMainDomain = getBaseURL(url).equals(baseURL)
+    val noColon =
+      true // !url.slice(url.indexOf("://") + 3, url.length).contains(":")
+    val onMainDomain = url.contains(MAIN_DOMAIN)
     prefix && noParams && noColon && onMainDomain
 
-  def ifValid(url: String, baseURL: String): Option[String] =
-    if isValidURL(url, baseURL) then Some(url) else None
+  def ifValid(url: String): Option[String] =
+    if isValidURL(url) then Some(url) else None
 
   def getBaseURL(url: String): String =
     val idx = url.indexOf("/", url.indexOf("://") + 3)
-    if idx == -1 then "!!SOMETHING_THAT_NEVER_MATCHES!!" else url.substring(0, idx)
+    url.substring(0, idx)
 
   def removeParams(url: String): String =
     val index = url.indexOf('?')
@@ -26,17 +25,20 @@ object UrlUtils {
 
     if url.startsWith("/") then
       // relative URL
-      ifValid(baseURL + noParamURL, baseURL)
+      ifValid(baseURL + noParamURL)
     else
       // absolute URL
-      ifValid(noParamURL, baseURL)
+      ifValid(noParamURL)
 
   def extractLinks(url: String, content: String): List[String] =
     val links = LINK_REGEX
       .findAllMatchIn(
         content
       )
-      .map(matched => if matched.group(1).nonEmpty then matched.group(1) else matched.group(2))
+      .map(matched =>
+        if matched.group(1) != null then matched.group(1)
+        else matched.group(2)
+      )
       .toList
 
     val baseURL = getBaseURL(url)
@@ -45,7 +47,7 @@ object UrlUtils {
       .foldLeft(List[String]())((acc, x) =>
         x match {
           case Some(value) => acc :+ value
-          case None => acc
+          case None        => acc
         }
       )
     targetLinks
