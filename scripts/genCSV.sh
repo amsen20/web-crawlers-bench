@@ -27,7 +27,7 @@ fi
 TARGET_DIR="./results/$PARAM-$(date +%Y%m%d%H%M%S)"
 mkdir $TARGET_DIR
 
-for name in go gJvm gNative cJvm cNative singleThreaded; do
+for name in go gJvm gNative cJvm cNative singleThreaded gurl; do
   case $name in
   go)
     RESULTS_DIR="../go/results"
@@ -46,6 +46,9 @@ for name in go gJvm gNative cJvm cNative singleThreaded; do
     ;;
   singleThreaded)
     RESULTS_DIR="../single-threaded/results"
+    ;;
+  gurl)
+    RESULTS_DIR="../gurl/native/results"
     ;;
 
   *)

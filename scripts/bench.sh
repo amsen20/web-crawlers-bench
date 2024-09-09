@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-USAGE="$0 (go|gJvm|gNative|cJvm|cNative|singleThreaded|all)"
+USAGE="$0 (go|gJvm|gNative|cJvm|cNative|singleThreaded|gurl|all)"
 
 show_usage() {
   echo "Error: $1"
@@ -74,7 +74,7 @@ prepare_gears_native() {
   HERE=$(pwd)
   cd "$NATIVE_ROOT/.."
 
-  sbt rootNative/run
+  sbt rootNative/nativeLink
   if [ $? -ne 0 ]; then
     finish "Failed to build native program"
   fi
@@ -114,7 +114,7 @@ prepare_cats_native() {
   HERE=$(pwd)
   cd "$CATS_NATIVE_ROOT/.."
 
-  sbt rootNative/run
+  sbt rootNative/nativeLink
   if [ $? -ne 0 ]; then
     finish "Failed to build native program"
   fi
@@ -142,6 +142,26 @@ prepare_single_threaded() {
   sbt nativeLink
   if [ $? -ne 0 ]; then
     finish "Failed to build single threaded native program"
+  fi
+
+  cd $HERE
+}
+
+# gurl
+GURL_ROOT="../gurl/native"
+set_gurl_vars() {
+  CMD="$GURL_ROOT/target/scala-3.3.3/web-crawler-gears $1 $TIMEOUT $2"
+  ROOT="$GURL_ROOT"
+  TARGET_FILE="$GURL_ROOT/results/test-$1-$2-$3.out"
+  export GC_STATS_FILE="$GURL_ROOT/results/gc-stats-$1-$2-$3.csv"
+}
+prepare_gurl() {
+  HERE=$(pwd)
+  cd "$GURL_ROOT/.."
+
+  sbt rootNative/nativeLink
+  if [ $? -ne 0 ]; then
+    finish "Failed to build native program"
   fi
 
   cd $HERE
@@ -197,9 +217,17 @@ singleThreaded)
     prepare_single_threaded
   }
   ;;
+gurl)
+  set_vars() {
+    set_gurl_vars $1 $2 $3
+  }
+  prepare() {
+    prepare_gurl
+  }
+  ;;
 all)
   echo "Running all benchmarks"
-  for name in go gJvm gNative cJvm cNative singleThreaded; do
+  for name in go gJvm gNative cJvm cNative singleThreaded gurl; do
     $0 $name
     if [ $? -ne 0 ]; then
       finish "failed to run the experiment for $name"
