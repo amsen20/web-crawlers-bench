@@ -33,13 +33,15 @@ lazy val root = crossProject(JVMPlatform, NativePlatform)
 
 ThisBuild / nativeConfig ~= { c =>
   val platformOptions = c
-    // .withMultithreading(true)
     .withLTO(LTO.none)
     .withGC(GC.immix)
   if (isDebug)
     platformOptions
-      .withMode(Mode.debug)
-      .withOptimize(false)
+      .withOptimize(false) // disable Scala Native optimizer
+      .withMode(
+        scalanative.build.Mode.debug
+      ) // compile using LLVM without optimizations
+      .withCompileOptions(Seq("-DSCALANATIVE_DELIMCC_DEBUG"))
   else
     platformOptions
       .withMode(Mode.releaseFull)
