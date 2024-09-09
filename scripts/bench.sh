@@ -245,7 +245,7 @@ for threads in 1 2 4; do
     echo "Running $NAME with $threads threads and $connections connections:"
     for ((i = 0; i < REPEATE_COUNT; i++)); do
       set_vars $threads $connections $i
-      cmd="taskset -c 0-$((threads - 1)) /usr/bin/time -f "memoryUsage=%M" $CMD | tee tmp"
+      cmd="taskset -c 0-$((threads - 1)) /usr/bin/time -f "memoryUsage=%M" $CMD 2>&1 | tee tmp"
       start_time=$(date +%s%3N)
       eval $cmd
       end_time=$(date +%s%3N)
@@ -253,7 +253,7 @@ for threads in 1 2 4; do
       echo "overallOverheadTime=$overallOverhead"
       echo "overallOverheadTime=$overallOverhead" >>tmp
       if [ $? -ne 0 ]; then
-        echo "Benchmark failed for $n threads and $connections connections"
+        echo "$name's benchmark failed for $n threads and $connections connections"
         cat tmp
         rm tmp
         exit 1
