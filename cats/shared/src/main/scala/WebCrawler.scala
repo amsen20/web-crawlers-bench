@@ -57,9 +57,9 @@ class WebCrawler(client: Client[IO]) {
 
   def exploreLayer(
       seen: HashSet[String],
-      layer: Array[String],
+      layer: List[String],
       maxConnections: Int
-  ): IO[Array[String]] =
+  ): IO[List[String]] =
     for {
       nextLayerR <- Ref[IO].of(HashSet[String]())
       tokenChan <- Queue.unbounded[IO, Unit]
@@ -86,12 +86,11 @@ class WebCrawler(client: Client[IO]) {
       // get tokens meaning the process is finished
       _ <- List.range(0, maxConnections).map(_ => tokenChan.take).sequence_
       nextLayer <- nextLayerR.get
-    } yield (nextLayer -- seen)
-      .toArray
+    } yield (nextLayer -- seen).toList
 
   def crawlRecursive(
       seen: HashSet[String],
-      layer: Array[String],
+      layer: List[String],
       maxConnections: Int,
       depth: Int
   ): IO[Unit] =
@@ -113,11 +112,11 @@ class WebCrawler(client: Client[IO]) {
       which returns found links one by one,
       then the maxDepth can be removed.
      */
-    val maxDepth = if DEBUG then 2 else 1000
+    val maxDepth = if DEBUG then 2 else 100000000
 
     for {
       _ <- foundR.set(HashSet[String](url))
-      _ <- crawlRecursive(HashSet.empty, Array(url), maxConnections, maxDepth)
+      _ <- crawlRecursive(HashSet.empty, List(url), maxConnections, maxDepth)
     } yield ()
   }
 }
