@@ -10,7 +10,8 @@ object Experiment {
   def run(
       crawler: WebCrawler,
       timeout: Int,
-      maxConnections: Int
+      maxConnections: Int,
+      doCancel: Boolean
   ): IO[Unit] =
     for {
 
@@ -20,15 +21,20 @@ object Experiment {
       _ <- IO(crawler.initRefs(foundR, successfulExploredR, charsDownloadedR))
 
       startTime = System.currentTimeMillis()
-      _ <- crawler
+      fiber <- crawler
         .crawl(START_URL, maxConnections)
-        .timeout(FiniteDuration(timeout, "ms"))
-        .handleErrorWith(e =>
-          e match
-            case _: TimeoutException => IO(())
-            case e: Throwable =>
-              IO(println(s"Task failed with $e"))
-        )
+        .start
+      // ! Need to control the timeout manually because the cancellation
+      // does not work properly in Scala Native.
+      // .timeout(FiniteDuration(timeout, "ms"))
+      // .handleErrorWith(e =>
+      //   e match
+      //     case _: TimeoutException => IO(())
+      //     case e: Throwable =>
+      //       IO(println(s"Task failed with $e"))
+      // )
+      _ <- IO.sleep(FiniteDuration(timeout, "ms"))
+      _ <- if doCancel then fiber.cancel else IO.unit
       endTime = System.currentTimeMillis()
 
       successfulExplored <- successfulExploredR.get

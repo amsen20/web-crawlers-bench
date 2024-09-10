@@ -5,7 +5,7 @@ ThisBuild / scalaVersion := "3.3.3"
 
 val catsVersion = "3.5.4"
 val http4sVersion = "0.23.27"
-val htt4psCurlVersion = "0.2.0"
+val htt4psCurlVersion = "0.2.2"
 
 val isDebug = false
 

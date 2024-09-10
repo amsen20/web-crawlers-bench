@@ -17,7 +17,10 @@ object Main extends CurlApp {
       _ <- IO(())
       timeout = args(0).toInt
       maxConnections = args(1).toInt
-      _ <- Experiment.run(crawler, timeout, maxConnections)
+      // ! Cannot cancel the fiber for crawling in scala native.
+      // ! It causes the execution to java.lang.illegalstateexception: dispatcher already closed
+      // ! So, we ignore the cancellation of the fiber.
+      _ <- Experiment.run(crawler, timeout, maxConnections, false)
     } yield ExitCode.Success
   }
 }
