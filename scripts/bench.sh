@@ -16,8 +16,8 @@ finish() {
 }
 
 # program arguments config:
-TIMEOUT=10000 # ms
-REPEATE_COUNT=3
+TIMEOUT=20000 # ms
+REPEATE_COUNT=5
 COOL_DOWN_TIME=2 # s
 
 # program execution config:
@@ -268,8 +268,8 @@ fi
 mkdir $TARGET_DIR
 
 echo "Running $NAME benchmarks"
-for threads in 1 2 4; do
-  for connections in 1 10 100 1000 10000; do
+for threads in 1 2 4 8; do
+  for connections in 1 16 128 512 1024 2048 4096 8192 16384; do
     echo "Running $NAME with $threads threads and $connections connections:"
     for ((i = 0; i < REPEATE_COUNT; i++)); do
       set_vars $threads $connections $i
@@ -277,17 +277,26 @@ for threads in 1 2 4; do
       start_time=$(date +%s%3N)
       eval $cmd
       end_time=$(date +%s%3N)
-      overallOverhead=$((end_time - start_time - $TIMEOUT))
-      echo "overallOverheadTime=$overallOverhead"
-      echo "overallOverheadTime=$overallOverhead" >>tmp
       if [ $? -ne 0 ]; then
         echo "$name's benchmark failed for $n threads and $connections connections"
         cat tmp
         rm tmp
-        exit 1
+
+        sleep $COOL_DOWN_TIME
+        echo "cleaning..."
+        killall java
+        sleep $COOL_DOWN_TIME
+        continue
       fi
+      overallOverhead=$((end_time - start_time - $TIMEOUT))
+      echo "overallOverheadTime=$overallOverhead"
+      echo "overallOverheadTime=$overallOverhead" >>tmp
       cp tmp $TARGET_FILE
       rm tmp
+
+      sleep $COOL_DOWN_TIME
+      echo "cleaning..."
+      killall java
       sleep $COOL_DOWN_TIME
     done
   done
