@@ -7,16 +7,31 @@ show_usage() {
   exit 1
 }
 
-OUTPUT_ENABLED=false
+VERBOSE=false
+ echo "$@"
+if echo "$@" | grep -q "\-v"; then
+  echo "verbose mode"
+  VERBOSE=true
+fi
 
-if [ $# -ne 1 ]; then
+echo_verbose() {
+  if [ "$VERBOSE" == "true" ]; then
+    echo $1
+  fi
+}
+
+if [ $# -lt 1 ]; then
   show_usage "Missing program argument"
 fi
 PARAM=$1
 
 if [ "$PARAM" == "all" ]; then
   for param in found overallOverheadTime memoryUsage; do
-    $0 $param
+    if [ "$VERBOSE" == "true" ]; then
+      $0 $param -v
+    else
+      $0 $param
+    fi
   done
 
   exit 0
@@ -66,11 +81,11 @@ for name in go gJvm gNative cJvm cNative singleThreaded gurl; do
 
   for file in $RESULTS_DIR/test-*; do
     if [ -f "$file" ]; then
-      echo "processing $file"
+      echo_verbose "processing $file"
       file_name=$(basename "$file")
       threads=$(echo "$file_name" | awk -F'-' '{print $2}')
       connections=$(echo "$file_name" | awk -F'-' '{print $3}')
-      echo "threads=$threads, connections=$connections"
+      echo_verbose "threads=$threads, connections=$connections"
 
       param_val=$(cat $file | grep "$PARAM=" | cut -d"=" -f2)
       found_val=$(cat $file | grep "found=" | cut -d"=" -f2)
@@ -80,10 +95,7 @@ for name in go gJvm gNative cJvm cNative singleThreaded gurl; do
       fi
 
       if [[ -n "$found_val" ]]; then
-        if [ "$OUTPUT_ENABLED" = true ]; then
-          echo "$name,$connections,$param_val"
-        fi
-
+        echo_verbose "$name,$connections,$param_val"
         echo "$name,$connections,$param_val" >>$target_file
       else
         echo "No found in $file in $name"
