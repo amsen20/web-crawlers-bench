@@ -7,6 +7,8 @@ show_usage() {
   exit 1
 }
 
+OUTPUT_ENABLED=false
+
 if [ $# -ne 1 ]; then
   show_usage "Missing program argument"
 fi
@@ -78,8 +80,13 @@ for name in go gJvm gNative cJvm cNative singleThreaded gurl; do
       fi
 
       if [[ -n "$found_val" ]]; then
-        echo "$name,$connections,$param_val"
+        if [ "$OUTPUT_ENABLED" = true ]; then
+          echo "$name,$connections,$param_val"
+        fi
+
         echo "$name,$connections,$param_val" >>$target_file
+      else
+        echo "No found in $file in $name"
       fi
 
     fi
