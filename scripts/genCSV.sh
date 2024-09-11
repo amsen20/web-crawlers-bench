@@ -71,12 +71,17 @@ for name in go gJvm gNative cJvm cNative singleThreaded gurl; do
       echo "threads=$threads, connections=$connections"
 
       param_val=$(cat $file | grep "$PARAM=" | cut -d"=" -f2)
+      found_val=$(cat $file | grep "found=" | cut -d"=" -f2)
       target_file="$TARGET_DIR/t-$threads.csv"
       if [ ! -f $target_file ]; then
         echo "name,connections,$PARAM" >$target_file
       fi
-      echo "$name,$connections,$param_val"
-      echo "$name,$connections,$param_val" >>$target_file
+
+      if [[ -n "$found_val" ]]; then
+        echo "$name,$connections,$param_val"
+        echo "$name,$connections,$param_val" >>$target_file
+      fi
+
     fi
   done
 done
