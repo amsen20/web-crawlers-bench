@@ -242,6 +242,9 @@ esac
 
 echo "--------Starting benchmark for $NAME--------"
 
+echo "Killing servers"
+killall main
+
 echo "Setting up vars"
 set_vars 0 0 0
 
@@ -272,29 +275,40 @@ for threads in 1 2 4 8; do
   for connections in 1 16 128 512 1024 2048 4096 8192 16384; do
     echo "Running $NAME with $threads threads and $connections connections:"
     for ((i = 0; i < REPEATE_COUNT; i++)); do
+
+      echo "starting server..."
+
+      ./server.sh &
+      server_pid=$!
+
+      sleep 1 # server startup time
+
       set_vars $threads $connections $i
       cmd="taskset -c 0-$((threads - 1)) /usr/bin/time -f "memoryUsage=%M" $CMD 2>&1 | tee tmp"
       start_time=$(date +%s%3N)
       eval $cmd
+      exit_code=$?
       end_time=$(date +%s%3N)
-      if [ $? -ne 0 ]; then
-        echo "$name's benchmark failed for $n threads and $connections connections"
-        cat tmp
-        rm tmp
 
-        sleep $COOL_DOWN_TIME
-        echo "cleaning..."
-        killall java
-        sleep $COOL_DOWN_TIME
-        continue
-      fi
+      echo "killing server..."
+      killall main
+
+      # if [ exit_code -ne 0 ]; then
+      #   echo "$name's benchmark failed for $n threads and $connections connections"
+      #   cat tmp
+      #   rm tmp
+
+      #   echo "cleaning..."
+      #   killall java
+      #   sleep $COOL_DOWN_TIME
+      #   continue
+      # fi
       overallOverhead=$((end_time - start_time - $TIMEOUT))
       echo "overallOverheadTime=$overallOverhead"
       echo "overallOverheadTime=$overallOverhead" >>tmp
       cp tmp $TARGET_FILE
       rm tmp
 
-      sleep $COOL_DOWN_TIME
       echo "cleaning..."
       killall java
       sleep $COOL_DOWN_TIME
