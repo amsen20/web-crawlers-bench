@@ -18,7 +18,7 @@ finish() {
 # program arguments config:
 TIMEOUT=20000 # ms
 REPEATE_COUNT=5
-COOL_DOWN_TIME=2 # s
+COOL_DOWN_TIME=5 # s
 
 # program execution config:
 
@@ -271,8 +271,8 @@ fi
 mkdir $TARGET_DIR
 
 echo "Running $NAME benchmarks"
-for threads in 1 2 4 8; do
-  for connections in 1 16 128 512 1024 2048 4096 8192 16384; do
+for threads in 4 1 2 4; do
+  for connections in 1024 1 16 128 256 512 700 900 1024 1200 1300 1400; do
     echo "Running $NAME with $threads threads and $connections connections:"
     for ((i = 0; i < REPEATE_COUNT; i++)); do
 
@@ -281,7 +281,7 @@ for threads in 1 2 4 8; do
       ./server.sh &
       server_pid=$!
 
-      sleep 1 # server startup time
+      sleep 5 # server startup time
 
       set_vars $threads $connections $i
       cmd="taskset -c 0-$((threads - 1)) /usr/bin/time -f "memoryUsage=%M" $CMD 2>&1 | tee tmp"

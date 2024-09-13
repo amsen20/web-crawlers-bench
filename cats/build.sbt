@@ -34,7 +34,7 @@ lazy val root = crossProject(JVMPlatform, NativePlatform)
 ThisBuild / nativeConfig ~= { c =>
   val platformOptions = c
     .withLTO(LTO.none)
-    .withGC(GC.immix)
+    .withGC(GC.none)
   if (isDebug)
     platformOptions
       .withOptimize(false) // disable Scala Native optimizer

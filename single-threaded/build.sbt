@@ -4,7 +4,7 @@ import scalanative.build._
 ThisBuild / scalaVersion := "3.3.3"
 ThisBuild / scalacOptions += "-deprecation"
 
-val purlVersion = "0.2-779c415-20240904T173117Z-SNAPSHOT"
+val purlVersion = "0.2-a688e8b-20240909T192735Z-SNAPSHOT"
 
 val isDebug = false
 
@@ -23,7 +23,7 @@ ThisBuild / nativeConfig ~= { c =>
   val platformOptions = c
     .withMultithreading(true)
     .withLTO(LTO.none)
-    .withGC(GC.immix)
+    .withGC(GC.none)
   if (isDebug)
     platformOptions
       .withSourceLevelDebuggingConfig(

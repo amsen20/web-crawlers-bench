@@ -5,7 +5,7 @@ ThisBuild / scalaVersion := "3.3.3"
 ThisBuild / scalacOptions += "-deprecation"
 
 val gearsVersion = "0.2.0"
-val gurlVersion = "0.1-d18ab64-20240909T165516Z-SNAPSHOT"
+val gurlVersion = "0.1-f506a89-SNAPSHOT"
 
 val isDebug = false
 
@@ -34,7 +34,7 @@ ThisBuild / nativeConfig ~= { c =>
   val platformOptions = c
     .withMultithreading(true)
     .withLTO(LTO.none)
-    .withGC(GC.immix)
+    .withGC(GC.none)
   if (isDebug)
     platformOptions
       .withSourceLevelDebuggingConfig(

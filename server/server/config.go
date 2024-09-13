@@ -2,8 +2,8 @@ package server
 
 const (
 	PORT           int64 = 8080
-	BRANCH_FACTOR        = 10   // 2
-	CHARS_PER_LINK       = 1000 // 5000
+	BRANCH_FACTOR        = 10   // 10
+	CHARS_PER_LINK       = 100  // 1000
 )
 
 const (

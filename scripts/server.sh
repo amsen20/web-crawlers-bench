@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-SERVER_BINDING="4-7"
+SERVER_BINDING="32-63"
 SERVER_CMD="./main"
 
 cd ../server
