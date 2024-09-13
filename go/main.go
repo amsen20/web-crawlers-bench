@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"time"
 	"webcrawler/crawler"
-	"runtime/debug"
 )
 
 func main() {
-	debug.SetGCPercent(-1)
+	// debug.SetGCPercent(-1)
 	timeout := flag.Int("timeout", 0, "duration of crawling")
 	maxConnections := flag.Int("max-connections", 0, "maximum number of parallel connections")
 	flag.Parse()

@@ -16,9 +16,41 @@ finish() {
 }
 
 # program arguments config:
-TIMEOUT=20000 # ms
-REPEATE_COUNT=5
-COOL_DOWN_TIME=5 # s
+if [ -z "$TIMEOUT" ]; then
+  echo "no TIMEOUT variable found"
+  exit 1
+fi
+echo "TIMEOUT=$TIMEOUT"
+
+if [ -z "$THREADS_SEQ" ]; then
+  echo "no THREADS_SEQ variable found"
+  exit 1
+fi
+echo "THREADS_SEQ=$THREADS_SEQ"
+
+if [ -z "$CONNECTIONS_SEQ" ]; then
+  echo "no CONNECTIONS_SEQ variable found"
+  exit 1
+fi
+echo "CONNECTIONS_SEQ=$CONNECTIONS_SEQ"
+
+if [ -z "$REPEATE_COUNT" ]; then
+  echo "no REPEATE_COUNT variable found"
+  exit 1
+fi
+echo "REPEATE_COUNT=$REPEATE_COUNT"
+
+if [ -z "$COOL_DOWN_TIME" ]; then
+  echo "no COOL_DOWN_TIME variable found"
+  exit 1
+fi
+echo "COOL_DOWN_TIME=$COOL_DOWN_TIME"
+
+if [ -z "$COOL_DOWN_TIME" ]; then
+  echo "no AFTER_SERVER_START variable found"
+  exit 1
+fi
+echo "AFTER_SERVER_START=$AFTER_SERVER_START"
 
 # program execution config:
 
@@ -167,6 +199,23 @@ prepare_gurl() {
   cd $HERE
 }
 
+# Server
+SERVER_ROOT="../server"
+prepare_server() {
+  HERE=$(pwd)
+  cd "$SERVER_ROOT"
+
+  echo "Killing servers"
+  killall main
+
+  sleep $COOL_DOWN_TIME
+
+  echo "Building server"
+  go build main.go
+
+  cd $HERE
+}
+
 NAME=$1
 case $NAME in
 go)
@@ -242,8 +291,8 @@ esac
 
 echo "--------Starting benchmark for $NAME--------"
 
-echo "Killing servers"
-killall main
+echo "Preparing server"
+prepare_server
 
 echo "Setting up vars"
 set_vars 0 0 0
@@ -271,8 +320,8 @@ fi
 mkdir $TARGET_DIR
 
 echo "Running $NAME benchmarks"
-for threads in 4 1 2 4; do
-  for connections in 1024 1 16 128 256 512 700 900 1024 1200 1300 1400; do
+for threads in $THREADS_SEQ; do
+  for connections in $CONNECTIONS_SEQ; do
     echo "Running $NAME with $threads threads and $connections connections:"
     for ((i = 0; i < REPEATE_COUNT; i++)); do
 
@@ -281,7 +330,7 @@ for threads in 4 1 2 4; do
       ./server.sh &
       server_pid=$!
 
-      sleep 5 # server startup time
+      sleep $AFTER_SERVER_START # server startup time
 
       set_vars $threads $connections $i
       cmd="taskset -c 0-$((threads - 1)) /usr/bin/time -f "memoryUsage=%M" $CMD 2>&1 | tee tmp"
@@ -303,6 +352,7 @@ for threads in 4 1 2 4; do
       #   sleep $COOL_DOWN_TIME
       #   continue
       # fi
+
       overallOverhead=$((end_time - start_time - $TIMEOUT))
       echo "overallOverheadTime=$overallOverhead"
       echo "overallOverheadTime=$overallOverhead" >>tmp

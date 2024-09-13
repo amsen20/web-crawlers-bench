@@ -36,7 +36,7 @@ ThisBuild / nativeConfig ~= { c =>
   val platformOptions = c
     .withMultithreading(true)
     .withLTO(LTO.none)
-    .withGC(GC.none)
+    .withGC(GC.immix)
   if (isDebug)
     platformOptions
       .withSourceLevelDebuggingConfig(

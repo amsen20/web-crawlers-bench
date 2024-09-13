@@ -11,7 +11,7 @@ func generateContent(seed int64) string {
 		}
 		content += "</p>\n"
 
-		pageId := (seed * BRANCH_FACTOR) + int64(i)
+		pageId := (seed * int64(BRANCH_FACTOR)) + int64(i)
 
 		content += `<a href="/page/`
 		content += fmt.Sprintf("%d", pageId)

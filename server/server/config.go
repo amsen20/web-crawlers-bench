@@ -1,13 +1,14 @@
 package server
 
 const (
-	PORT           int64 = 8080
-	BRANCH_FACTOR        = 10   // 10
-	CHARS_PER_LINK       = 100  // 1000
+	PORT int64 = 8080
 )
 
+var BRANCH_FACTOR = -1
+var CHARS_PER_LINK = -1
+
 const (
-	MSG = "HELLO"
+	MSG = "A"
 )
 
 const (
