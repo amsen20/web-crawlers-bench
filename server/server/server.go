@@ -17,6 +17,9 @@ func StartServer() {
 	if !DEBUG {
 		gin.SetMode(gin.ReleaseMode)
 	}
+
+	templateContent := generateTemplateContent()
+
 	r := gin.Default()
 	r.LoadHTMLFiles("./server/template.html")
 	r.Use(cors.Default())
@@ -30,7 +33,7 @@ func StartServer() {
 		time.Sleep(time.Duration(delay) * time.Millisecond)
 
 		c.HTML(http.StatusOK, "template.html", gin.H{
-			"content": template.HTML(generateContent(id)),
+			"content": template.HTML(generateContent(id, templateContent)),
 		})
 	})
 

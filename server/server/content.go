@@ -2,7 +2,7 @@ package server
 
 import "fmt"
 
-func generateContent(seed int64) string {
+func generateTemplateContent() string {
 	var content string
 	for i := 0; i < BRANCH_FACTOR; i++ {
 		content += "<p>\n"
@@ -10,15 +10,20 @@ func generateContent(seed int64) string {
 			content += MSG
 		}
 		content += "</p>\n"
-
-		pageId := (seed * int64(BRANCH_FACTOR)) + int64(i)
-
-		content += `<a href="/page/`
-		content += fmt.Sprintf("%d", pageId)
-		content += `">`
-		content += fmt.Sprintf("Page %d", pageId)
-		content += "</a>\n"
+		content += `<a href="/page/%d">Page %d</a>`
+		content += "\n"
 	}
 
 	return content
+}
+
+func generateContent(seed int64, templateContent string) string {
+	numbers := make([]interface{}, 0)
+
+	for i := 0; i < BRANCH_FACTOR; i++ {
+		pageId := (seed * int64(BRANCH_FACTOR)) + int64(i)
+		numbers = append(numbers, pageId, pageId)
+	}
+
+	return fmt.Sprintf(templateContent, numbers...)
 }
