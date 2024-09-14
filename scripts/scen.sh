@@ -2,13 +2,13 @@
 
 rm -rf results
 
-export SERVER_BINDING="5-7"
+export SERVER_BINDING="32-63"
 
-export TIMEOUT=100 # 20000                                                                        # ms
-export THREADS_SEQ="1 " # 2 4 8"                                                                # threads
-export CONNECTIONS_SEQ="1 " # 16 128 512 600 800 1024 1200 1400 1600 1800 2048 4096 8192 16384" # connections
+export TIMEOUT=20000                                                                        # ms
+export THREADS_SEQ="1 2 4 8"                                                                # threads
+export CONNECTIONS_SEQ="1 16 128 512 600 800 1024 1200 1400 1600 1800 2048 4096 8192 16384" # connections
 
-export REPEATE_COUNT=1 # 5      # s
+export REPEATE_COUNT=5      # s
 export COOL_DOWN_TIME=5     # s
 export AFTER_SERVER_START=5 # s
 
@@ -23,7 +23,7 @@ for name in go gJvm gNative cJvm gurl; do
 done
 
 echo "Running single-threaded clients"
-export THREADS_SEQ="1" # threads
+export THREADS_SEQ="1 2" # threads
 for name in singleThreaded cNative; do
   yes | ./bench.sh $name
   if [ $? -ne 0 ]; then
